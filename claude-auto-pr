@@ -1,0 +1,117 @@
+#!/bin/bash
+
+# Auto PR creator - Let Claude do all the work
+set -e
+
+echo "🤖 Gathering git information for Claude analysis..."
+
+# Get current branch
+CURRENT_BRANCH=$(git branch --show-current)
+echo "📍 Current branch: $CURRENT_BRANCH"
+
+# Ask user for parent branch
+echo ""
+echo "🌿 Available branches:"
+git branch -a --format='%(refname:short)' | grep -v "^$CURRENT_BRANCH$" | head -10 | sed 's/origin\///' | sort | uniq
+
+echo ""
+read -p "🎯 What branch should this PR target? [dev]: " PARENT_BRANCH
+PARENT_BRANCH=${PARENT_BRANCH:-dev}
+echo "   → Target branch: $PARENT_BRANCH"
+
+# Get commits since parent branch
+echo ""
+echo "📊 Getting changes since $PARENT_BRANCH..."
+RECENT_COMMITS=$(git log --oneline $PARENT_BRANCH..HEAD 2>/dev/null || git log --oneline -5)
+
+# Get changed files since parent
+CHANGED_FILES=$(git diff --name-only $PARENT_BRANCH..HEAD 2>/dev/null || git diff --name-only HEAD~3..HEAD)
+
+# Get git status
+GIT_STATUS=$(git status --porcelain)
+
+# Load PR template
+PR_TEMPLATE=$(cat "../.github/PULL_REQUEST_TEMPLATE.md")
+
+
+echo "📤 Sending all data to Claude for analysis..."
+
+# Create comprehensive prompt for Claude
+CLAUDE_PROMPT="You are a helpful assistant that creates GitHub pull requests. Analyze this git repository data and create a PR title and filled template.
+
+CURRENT BRANCH: $CURRENT_BRANCH
+TARGET BRANCH: $PARENT_BRANCH
+
+COMMITS SINCE $PARENT_BRANCH:
+$RECENT_COMMITS
+
+CHANGED FILES SINCE $PARENT_BRANCH:
+$CHANGED_FILES
+
+CURRENT GIT STATUS:
+$GIT_STATUS
+
+PR TEMPLATE TO FILL:
+$PR_TEMPLATE
+
+INSTRUCTIONS:
+1. Generate a PR title in this pattern: 
+- Title pattern: (dev name)/(task, bug, etc.)/(ticket id)-(description)
+- Extract the ticket ID and description
+- Convert ticket ID to uppercase
+- Replace dashes with spaces in description
+- Format as: TICKET-ID: description
+- Example: from sepehr/task/ebca-11743-change-copy-for-interact to EBCA-11743: change copy for interact
+
+2. Use the specified target branch: $PARENT_BRANCH
+
+3. Extract JIRA ticket from branch name or commit messages
+
+4. Fill the PR template with:
+   - Replace [JIRA-XXXX] with the actual ticket
+   - Fill Pull Request Purpose based on commits and changes
+   - List key changed files in Key Classes section (only class name with format)
+   - Keep all checkboxes and original format
+
+
+Return in exact format and remove []:
+TITLE: [generated title]
+PARENT_BRANCH: [branch to merge into]
+JIRA: [ticket number]
+TEMPLATE: [template content]\""
+
+# Send to Claude and save response
+echo "$CLAUDE_PROMPT" | claude --print > /tmp/claude_pr_response.txt
+
+echo "📝 Claude analysis complete!"
+echo "================================"
+cat /tmp/claude_pr_response.txt
+echo "================================"
+
+
+# Extract components from Claude's response
+echo ""
+echo "🔍 Extracting PR components from Claude response:"
+
+TITLE=$(grep -i "title:" /tmp/claude_pr_response.txt | head -1 | cut -d':' -f2- | xargs)
+
+# Extract template content (everything after TEMPLATE:)
+sed -n '/TEMPLATE:/,$p' /tmp/claude_pr_response.txt | tail -n +2 > /tmp/pr_template.txt
+
+if [ -n "$TITLE" ] && [ -n "$PARENT_BRANCH" ] && [ -s /tmp/pr_template.txt ]; then
+    echo ""
+    echo "🚀 Ready to create PR:"
+    echo "   gh pr create --title \"$TITLE\" --base \"$PARENT_BRANCH\" --body \"[AI-generated template]\""
+    echo ""
+    read -p "Execute this command? (y/n): " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Yy]$ ]]; then
+        gh pr create --title "$TITLE" --base "$PARENT_BRANCH" --body "$(cat /tmp/pr_template.txt)"
+        echo "✅ PR created successfully!"
+    fi
+else
+    echo "❌ Missing required components:"
+    [ -z "$TITLE" ] && echo "   - No title found"
+    [ -z "$PARENT_BRANCH" ] && echo "   - No parent branch"
+    [ ! -s /tmp/pr_template.txt ] && echo "   - No template content"
+fi
