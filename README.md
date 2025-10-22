@@ -80,14 +80,14 @@ cp claude-command/auto-pr.md ~/.claude/commands/
 All solutions expect:
 - A git repository with a PR template at `.github/PULL_REQUEST_TEMPLATE.md`
 - Branch naming convention: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
-  - Example: `sepehr/task/ebca-11743-change-copy-for-interact`
+  - Example: `sepehr/task/sa-ebca-11743-change-copy-for-interact`
 - GitHub CLI (`gh`) authenticated (for bash script and Claude command)
 
 ## Branch Naming Convention
 
 Expected pattern: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
 
-**Example Branch:** `sepehr/task/ebca-11743-change-copy-for-interact`
+**Example Branch:** `sepehr/task/sa-ebca-11743-change-copy-for-interact`
 
 **Generated Title:** `EBCA-11743: change copy for interact`
 
@@ -109,7 +109,7 @@ All solutions automatically:
 | Feature | Chrome Extension | Bash Script | Claude Command |
 |---------|-----------------|-------------|----------------|
 | **Environment** | Browser | Terminal | Claude Code |
-| **AI Provider** | OpenAI/Anthropic | Claude CLI | Claude Code |
+| **AI Provider** | OpenAI | Claude CLI | Claude Code |
 | **Setup Complexity** | Medium | Low | Low |
 | **Interaction** | GUI | Interactive CLI | Conversational |
 | **PR Creation** | Manual copy-paste | Automatic | Automatic |
