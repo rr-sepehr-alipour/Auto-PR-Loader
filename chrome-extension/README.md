@@ -205,31 +205,6 @@ Tested on:
 - API calls count against your OpenAI usage
 - Large PRs may timeout or require stronger models
 
-## Future Enhancements
-
-Potential improvements:
-- [ ] Support for GitHub Enterprise
-- [ ] Firefox/Safari versions
-- [ ] Offline template suggestions
-- [ ] Multiple AI provider switching
-- [ ] Automatic branch name parsing improvements
-- [ ] Template sharing/import/export
-
-## Development
-
-### Local Development
-
-1. Make changes to extension files
-2. Go to `chrome://extensions/`
-3. Click refresh icon on the extension card
-4. Test changes on GitHub PR pages
-
-### Debugging
-
-1. **Popup**: Right-click extension icon → Inspect popup
-2. **Content Script**: F12 on GitHub page → Console tab
-3. **Background**: Go to `chrome://extensions/` → Service Worker → Inspect
-
 ## Back to Main Documentation
 
 [← Back to main README](../README.md)
