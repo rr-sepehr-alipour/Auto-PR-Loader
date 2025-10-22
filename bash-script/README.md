@@ -170,20 +170,6 @@ Change line 19 to modify default branch:
 PARENT_BRANCH=${PARENT_BRANCH:-dev}  # Change 'dev' to your default
 ```
 
-## Troubleshooting
-
-### "claude: command not found"
-Install Claude CLI: https://docs.anthropic.com/en/api/claude-cli
-
-### "gh: command not found"
-Install GitHub CLI: https://cli.github.com/
-
-### "No such file: PULL_REQUEST_TEMPLATE.md"
-Ensure your repository has a PR template at `.github/PULL_REQUEST_TEMPLATE.md` relative to the script location.
-
-### PR title not extracted correctly
-Check `/tmp/claude_pr_response.txt` to see Claude's raw output. The script looks for `TITLE:` in the response.
-
 ## Notes
 
 - Script uses `set -e` for fail-fast behavior
