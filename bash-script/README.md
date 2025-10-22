@@ -78,7 +78,7 @@ Sends data to Claude CLI with instructions to:
 
 Expected branch pattern: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
 
-**Example**: `sepehr/task/ebca-11743-change-copy-for-interact`
+**Example**: `sepehr/task/sa-ebca-11743-change-copy-for-interact`
 
 **Generated Title**: `EBCA-11743: change copy for interact`
 
@@ -86,7 +86,7 @@ Expected branch pattern: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
 
 ```
 🤖 Gathering git information for Claude analysis...
-📍 Current branch: sepehr/task/ebca-11760-move-native-auth-packages
+📍 Current branch: sepehr/task/sa-ebca-11760-move-native-auth-packages
 
 🌿 Available branches:
 dev
