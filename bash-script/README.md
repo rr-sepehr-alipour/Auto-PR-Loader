@@ -5,7 +5,7 @@ A bash script that uses the Claude CLI to automatically generate and create GitH
 ## Prerequisites
 
 - `gh` CLI tool installed and authenticated ([Installation guide](https://cli.github.com/))
-- `claude` CLI tool installed and authenticated ([Installation guide](https://docs.anthropic.com/en/api/claude-cli))
+- `claude` CLI tool installed and authenticated ([Installation guide](https://rakutenrewards.atlassian.net/wiki/spaces/E2/pages/43493294436/Claude+Code+Onboarding))
 - Git repository with a `.github/PULL_REQUEST_TEMPLATE.md` file
 - Bash shell environment
 
