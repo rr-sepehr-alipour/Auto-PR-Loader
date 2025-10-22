@@ -31,8 +31,8 @@ ls ~/.claude/commands/
 
 ### In Claude Code
 
-1. Navigate to your git repository
-2. Run the command:
+1. Navigate to your git repository and make sure you push your changes
+3. Run the command:
 ```
 /auto-pr
 ```
@@ -248,7 +248,7 @@ Check your branch naming matches the expected pattern:
 ```
 /auto-pr
 Claude: What branch should this PR target?
-You: staging
+You: dev
 ```
 
 ### Review Before Creating
