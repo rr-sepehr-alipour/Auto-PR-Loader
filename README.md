@@ -1,114 +1,135 @@
-# Claude Auto PR Script
+# AI PR Description Autofiller
 
-A bash script that uses Claude AI to automatically generate GitHub pull requests with properly formatted titles and filled templates.
+A comprehensive toolkit that leverages AI to automatically generate GitHub pull request titles and descriptions. This repository offers three different solutions to fit your workflow preferences.
 
-## Prerequisites
+## Overview
 
-- `gh` CLI tool installed and authenticated
-- `claude` CLI tool installed and authenticated
-- Git repository with a `.github/PULL_REQUEST_TEMPLATE.md` file
-- Bash shell environment
+Creating well-formatted pull requests with properly filled templates can be time-consuming. These tools use AI to analyze your git changes, commits, and branch information to automatically:
+- Generate descriptive PR titles following your naming conventions
+- Fill PR templates with relevant information
+- Extract JIRA ticket numbers from branch names or commits
+- List key changed files and provide context
 
-## Installation
+## Solutions
 
-No installation needed. Just make the script executable:
+### 1. Chrome Extension
+**Best for:** Users who prefer a browser-based solution with a GUI
 
+A Chrome extension that adds an autofill button directly to GitHub's PR creation page.
+
+**Features:**
+- One-click autofill on GitHub PR pages
+- Configurable AI provider (OpenAI for now)
+- Visual interface with settings management
+- Works entirely in the browser
+
+[See Chrome Extension Documentation →](./chrome-extension/README.md)
+
+### 2. Bash Script
+**Best for:** Developers who prefer command-line automation
+
+A standalone bash script that uses the Claude CLI to generate and create PRs directly from your terminal.
+
+**Features:**
+- Complete CLI workflow
+- Interactive branch selection
+- PR preview before creation
+- No browser needed
+
+[See Bash Script Documentation →](./bash-script/README.md)
+
+### 3. Claude Custom Command
+**Best for:** Claude Code users who want integrated AI assistance
+
+A custom command for Claude Code that allows you to create PRs through conversational AI interaction.
+
+**Features:**
+- Natural language interaction
+- Integrated into your Claude Code workflow
+- Step-by-step guidance
+- Direct access to Claude's analysis capabilities
+
+[See Claude Command Documentation →](./claude-command/README.md)
+
+## Quick Start
+
+### Chrome Extension
 ```bash
-chmod +x claude-auto-pr.sh
+cd chrome-extension
+# Load unpacked extension in Chrome
+# Configure API key in extension settings
 ```
 
-## Usage
-
-Run the script from your git repository:
-
+### Bash Script
 ```bash
-./claude-auto-pr.sh
+cd bash-script
+chmod +x claude-auto-pr
+./claude-auto-pr
 ```
 
-### Interactive Flow
+### Claude Custom Command
+```bash
+# Copy command file to your Claude commands directory
+cp claude-command/auto-pr.md ~/.claude/commands/
+# Use in Claude Code:
+/auto-pr
+```
 
-1. **Branch Detection**: Script detects your current branch
-2. **Target Branch Selection**: Choose target branch (defaults to `dev`)
-3. **AI Analysis**: Claude analyzes commits, changes, and template
-4. **Review**: Review the generated PR title and body
-5. **Confirmation**: Confirm to create the PR
+## Common Requirements
 
-## How It Works
-
-1. **Gathers Git Data**:
-   - Current branch name
-   - Commits since target branch
-   - Changed files
-   - Git status
-
-2. **AI Processing**:
-   - Sends data to Claude CLI
-   - Generates PR title from branch name pattern
-   - Fills PR template with relevant information
-   - Extracts JIRA ticket from branch/commits
-
-3. **PR Creation**:
-   - Uses `gh pr create` to create the pull request
-   - Applies generated title and body
+All solutions expect:
+- A git repository with a PR template at `.github/PULL_REQUEST_TEMPLATE.md`
+- Branch naming convention: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
+  - Example: `sepehr/task/ebca-11743-change-copy-for-interact`
+- GitHub CLI (`gh`) authenticated (for bash script and Claude command)
 
 ## Branch Naming Convention
 
-Expected branch pattern: `dev-name/(task|bug|etc.)/ticket-id-description`
+Expected pattern: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
 
-**Example**: `sepehr/task/ebca-11743-change-copy-for-interact`
+**Example Branch:** `sepehr/task/ebca-11743-change-copy-for-interact`
 
-**Generated Title**: `EBCA-11743: change copy for interact`
+**Generated Title:** `EBCA-11743: change copy for interact`
+
+The tools will:
+- Extract the ticket ID and convert to uppercase
+- Replace dashes with spaces in the description
+- Format as: `TICKET-ID: description`
 
 ## Template Processing
 
-The script automatically:
-- Replaces `[JIRA-XXXX]` placeholders with actual ticket numbers
-- Fills "Pull Request Purpose" section based on commits
-- Lists key changed files in "Key Classes" section
-- Preserves all checkboxes and formatting
+All solutions automatically:
+- Replace `[JIRA-XXXX]` placeholders with actual ticket numbers
+- Fill "Pull Request Purpose" section based on commits and changes
+- List key changed files in relevant sections
+- Preserve all checkboxes and template formatting
 
-## Output Files
+## Comparison
 
-Temporary files created during execution:
-- `/tmp/claude_pr_response.txt` - Claude's full analysis
-- `/tmp/pr_template.txt` - Processed template body
+| Feature | Chrome Extension | Bash Script | Claude Command |
+|---------|-----------------|-------------|----------------|
+| **Environment** | Browser | Terminal | Claude Code |
+| **AI Provider** | OpenAI/Anthropic | Claude CLI | Claude Code |
+| **Setup Complexity** | Medium | Low | Low |
+| **Interaction** | GUI | Interactive CLI | Conversational |
+| **PR Creation** | Manual copy-paste | Automatic | Automatic |
+| **Best For** | GUI lovers | CLI enthusiasts | Claude users |
 
-## Example Output
+## Contributing
 
-```
-🤖 Gathering git information for Claude analysis...
-📍 Current branch: sepehr/task/ebca-11760-move-native-auth-packages-to-ca
+Contributions are welcome! Feel free to:
+- Report bugs
+- Suggest improvements
+- Add support for new AI providers
+- Improve documentation
 
-🌿 Available branches:
-dev
-main
-...
+## License
 
-🎯 What branch should this PR target? [dev]: dev
-   → Target branch: dev
+MIT License - feel free to use and modify for your needs.
 
-📊 Getting changes since dev...
-📤 Sending all data to Claude for analysis...
-📝 Claude analysis complete!
+## Acknowledgments
 
-🚀 Ready to create PR:
-   gh pr create --title "EBCA-11760: move native auth packages to ca" --base "dev" --body "[AI-generated template]"
-
-Execute this command? (y/n):
-```
-
-## Error Handling
-
-The script validates:
-- PR title extraction
-- Parent branch specification
-- Template content generation
-
-If any component is missing, it reports specific errors and exits without creating a PR.
-
-## Notes
-
-- Script uses `set -e` for fail-fast behavior
-- Requires valid PR template at `../.github/PULL_REQUEST_TEMPLATE.md`
-- Claude CLI must be available in PATH
-- GitHub CLI must be authenticated with appropriate repository access
+Built with:
+- [Claude AI](https://claude.ai) by Anthropic
+- [GitHub CLI](https://cli.github.com/)
+- [OpenAI API](https://openai.com/api/)
