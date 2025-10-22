@@ -4,7 +4,7 @@ A custom command for Claude Code that enables conversational PR creation with AI
 
 ## Prerequisites
 
-- [Claude Code](https://docs.claude.com/en/docs/claude-code) installed and configured
+- [Claude Code](https://rakutenrewards.atlassian.net/wiki/spaces/E2/pages/43493294436/Claude+Code+Onboarding) installed and configured
 - `gh` CLI tool installed and authenticated ([Installation guide](https://cli.github.com/))
 - Git repository with a `.github/PULL_REQUEST_TEMPLATE.md` file
 
