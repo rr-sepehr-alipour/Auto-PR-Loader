@@ -49,18 +49,9 @@ A Chrome extension that adds AI-powered autofill capabilities directly to GitHub
 
 1. Navigate to GitHub and start creating a new pull request
 2. Click the extension icon in your toolbar
-3. Choose one of two options:
-
-   **Option A: Generate PR Description**
-   - Select a template from the dropdown
-   - Click **Generate PR Description**
-   - Review generated content in the popup
-   - Copy and paste into PR form
-
-   **Option B: Autofill Current PR**
-   - Click **Autofill Current PR**
-   - Extension automatically fills the PR description field
-   - Review and edit as needed
+3. Click **Autofill Current PR**
+4. Extension automatically fills the PR description field
+5. Review and edit as needed
 
 ### Managing Templates
 
