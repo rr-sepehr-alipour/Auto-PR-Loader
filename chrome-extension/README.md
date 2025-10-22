@@ -6,7 +6,7 @@ A Chrome extension that adds AI-powered autofill capabilities directly to GitHub
 
 - 🤖 One-click PR description generation on GitHub
 - 🎨 Clean, intuitive popup interface
-- 🔧 Configurable AI provider (OpenAI, Anthropic)
+- 🔧 Configurable AI provider (OpenAI)
 - 📝 Support for multiple PR templates
 - ⚙️ Easy settings management
 - 🔒 API keys stored securely in browser storage
