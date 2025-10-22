@@ -115,7 +115,6 @@ Edit `options.html` and `options.js` to add support for additional AI providers:
 
 **Currently Supported:**
 - OpenAI (GPT-3.5/GPT-4)
-- Anthropic Claude (via API)
 
 ### Custom Template Format
 
