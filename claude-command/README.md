@@ -1,271 +1,134 @@
-# Claude Custom Command - Auto PR Creator
+# PR Creation Skill
 
-A custom command for Claude Code that enables conversational PR creation with AI-powered analysis and template filling.
+An automated agent that creates comprehensive pull request descriptions by analyzing your git history and following your project's PR template.
 
 ## Prerequisites
 
-- [Claude Code](https://rakutenrewards.atlassian.net/wiki/spaces/E2/pages/43493294436/Claude+Code+Onboarding) installed and configured
-- `gh` CLI tool installed and authenticated ([Installation guide](https://cli.github.com/))
-- Git repository with a `.github/PULL_REQUEST_TEMPLATE.md` file
+- Git repository (committed changes recommended, but skill handles uncommitted changes)
+- **GitHub CLI** (recommended): `gh` from [cli.github.com](https://cli.github.com) - authenticate with `gh auth login`
+- PR template (optional): `.github/pull_request_template.md` in your repo
 
-## Installation
+## How to Invoke
 
-1. Copy the command file to your Claude commands directory:
-```bash
-cp auto-pr.md ~/.claude/commands/
-```
+Simply ask Claude to create a PR:
+- "Create a PR for my changes"
+- "Help me create a pull request"
+- "I'm ready to submit a PR"
 
-Or manually:
-```bash
-mkdir -p ~/.claude/commands
-cp auto-pr.md ~/.claude/commands/
-```
+Claude will automatically invoke the **pr-creation** skill and guide you through the process.
 
-2. Verify installation:
-```bash
-ls ~/.claude/commands/
-# Should show: auto-pr.md
-```
+## When to Use
 
-## Usage
+Invoke when you're ready to create a PR or need help writing a PR description.
 
-### In Claude Code
+## Key Features
 
-1. Navigate to your git repository and make sure you push your changes
-3. Run the command:
-```
-/auto-pr
-```
-
-3. Claude will guide you through:
-   - Analyzing your current branch and changes
-   - Selecting a target branch
-   - Generating PR title and description
-   - Reviewing the PR preview
-   - Creating the PR
-
-### Example Interaction
-
-```
-You: /auto-pr
-
-Claude: I'll help you create a GitHub pull request. Let me gather information about your current branch.
-
-[Claude analyzes git information]
-
-Claude: I see you're on branch `sepehr/task/ebca-11743-change-copy-for-interact`.
-
-Available branches:
-- dev
-- main
-- staging
-
-What branch should this PR target? (Default: dev)
-
-You: dev
-
-Claude: Great! I'll target the `dev` branch. Let me analyze your changes...
-
-[Claude reads commits, changed files, and PR template]
-
-Claude: Here's the PR I've prepared:
-
-**Title:** EBCA-11743: change copy for interact
-
-**Target Branch:** dev
-
-**Description:**
-## [EBCA-11743]
-
-### Pull Request Purpose
-...
-
-Does this look good? Should I create the PR?
-
-You: yes
-
-Claude: [Creates PR using gh pr create]
-
-✅ Pull request created successfully!
-https://github.com/your-org/your-repo/pull/123
-```
+- **Flexible ticket support**: Auto-detects Jira tickets (default) or works without any ticket system
+- **Smart analysis**: Checks git state, reviews commits, analyzes diffs with size warnings (>100 files or >5,000 lines)
+- **Template handling**: Searches multiple locations, handles missing templates gracefully
+- **Draft PR support**: Create draft or ready-for-review PRs
+- **Configurable**: Works with any base branch (main, dev, develop, etc.)
+- **Safe**: Validates everything before proceeding, never fabricates information
 
 ## How It Works
 
-### Step-by-Step Process
+### 1. Information Collection
+- Detects current branch and attempts to extract Jira ticket key (e.g., `ABC-123` from `feature/ABC-123-fix-login`)
+- If no ticket found, asks if you want to provide one or proceed without
+- Extracts description from branch name
 
-1. **Gather Git Information**
-   - Detects current branch using `git branch --show-current`
-   - Retrieves commits since parent branch
-   - Lists changed files
-   - Checks git status
+### 2. Confirmation
+- Shows: branch name, ticket (if any), proposed PR title
+- Asks for target base branch and waits for your response
+- Asks if you want draft or ready-for-review and waits for your response
+- Asks for final approval to continue with analysis
 
-2. **Ask for Target Branch**
-   - Lists available branches
-   - Prompts for target branch selection
-   - Defaults to `dev` if not specified
-   - Waits for user confirmation before proceeding
+### 3. Analysis
+- Checks for uncommitted changes and unpushed branches
+- Finds PR template (searches multiple locations: `.github/`, `docs/`, etc.)
+- Reviews commit history for context
+- Analyzes diff with size checking - warns if very large
+- Identifies: features, fixes, refactors, breaking changes, dependencies, tests, etc.
 
-3. **Load PR Template**
-   - Reads template from `../.github/PULL_REQUEST_TEMPLATE.md`
-   - Preserves all formatting and structure
+### 4. PR Creation
+- Maps findings to your template sections
+- Asks targeted questions to fill any gaps
+- Generates complete PR description matching template exactly
+- Verifies GitHub CLI availability (provides manual commands if not installed)
+- Creates PR with appropriate title:
+  - With ticket: `ABC-123: Short description`
+  - Without ticket: `Short description`
+- Returns PR URL
 
-4. **Analyze and Generate**
-   - Generates PR title from branch name pattern:
-     - Pattern: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
-     - Extracts ticket ID and converts to uppercase
-     - Replaces dashes with spaces
-     - Format: `TICKET-ID: description`
-   - Example: `sepehr/task/sa-ebca-11743-change` → `EBCA-11743: change`
+## Usage Example
 
-5. **Fill PR Template**
-   - Replaces `[JIRA-XXXX]` with actual ticket number
-   - Fills "Pull Request Purpose" based on commits
-   - Lists key changed files in "Key Classes" section
-   - Maintains all checkboxes and formatting
+```
+You: "Create a PR for my changes"
 
-6. **Show Preview and Confirm**
-   - Displays complete PR preview
-   - Asks for user confirmation
-   - Creates PR using `gh pr create` command
+Agent: "I'll help you create a pull request. Let me analyze your branch..."
 
-## Command Configuration
+Agent: "I've identified the following information:
+- Branch: feature/ABC-123-update-login
+- Jira ticket: ABC-123
+- PR title: ABC-123: Update login error handling
 
-The command is configured with specific allowed tools for security:
+What is the target base branch for this PR (e.g., main, dev, develop)?"
 
-```yaml
-allowed-tools: Bash(git:*), Bash(gh:*), Read
+You: "main"
+
+Agent: "Would you like to create this as a draft PR or ready for review?"
+
+You: "ready for review"
+
+Agent: "Is this information correct? Should I proceed with gathering the git diff?"
+
+You: "yes"
+
+Agent: "Verifying git state..."
+Agent: "Locating PR template..."
+Agent: "Analyzing commit history and changes..."
+
+[Agent maps findings to template and asks any clarifying questions]
+
+Agent: "Creating pull request..."
+Agent: "✓ Pull request created successfully: https://github.com/org/repo/pull/123"
 ```
 
-This means Claude can only:
-- Run `git` commands to analyze your repository
-- Run `gh` commands to create pull requests
-- Read files (like the PR template)
+## Edge Cases Handled
 
-## Branch Naming Convention
-
-Expected pattern: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
-
-**Example**: `sepehr/task/ebca-11743-change-copy-for-interact`
-
-**Generated Title**: `EBCA-11743: change copy for interact`
-
-**Note**: The command removes developer initials from ticket IDs:
-- `sepehr/task/sa-ebca-11743-description` → `EBCA-11743: description`
-- Developer initials (e.g., `sa` for Sepehr Alipour) are automatically stripped
-
-## Customization
-
-### Modify Command Behavior
-
-Edit `auto-pr.md` to customize:
-
-1. **Default Branch**: Change line 14
-```markdown
-- Default to `dev` if not specified
-```
-
-2. **Title Pattern**: Adjust instructions in step 4
-```markdown
-- Generate a PR title following this pattern:
-  - Extract from branch name pattern: ...
-```
-
-3. **Template Location**: Modify step 3
-```markdown
-- Read the PR template from `../.github/PULL_REQUEST_TEMPLATE.md`
-```
-
-### Add Custom Fields
-
-Add additional instructions in step 5:
-```markdown
-5. **Fill PR Template:**
-   - Replace `[JIRA-XXXX]` with actual ticket
-   - Add your custom field here
-   - ...
-```
-
-## Advantages
-
-### vs. Bash Script
-- ✅ Natural language interaction
-- ✅ Can ask follow-up questions
-- ✅ More flexible and adaptive
-- ✅ Integrated into Claude Code workflow
-- ✅ No separate tool installation needed
-
-### vs. Chrome Extension
-- ✅ Works entirely in terminal
-- ✅ No browser needed
-- ✅ Automatic PR creation
-- ✅ Direct integration with git workflow
-- ✅ No API key configuration
-
-## Troubleshooting
-
-### Command Not Found
-
-If `/auto-pr` doesn't work:
-1. Check installation:
-   ```bash
-   ls ~/.claude/commands/auto-pr.md
-   ```
-2. Restart Claude Code
-3. Try with full path: `/commands/auto-pr`
-
-### Permission Denied on Git/GH Commands
-
-The command is restricted to safe operations:
-- If you need additional git commands, edit `allowed-tools` in `auto-pr.md`
-- Ensure `gh` CLI is authenticated: `gh auth status`
-
-### PR Template Not Found
-
-Ensure your template is at:
-```
-../.github/PULL_REQUEST_TEMPLATE.md
-```
-
-Relative to your Claude Code working directory. Adjust the path in `auto-pr.md` if needed.
-
-### Title Not Generated Correctly
-
-Check your branch naming matches the expected pattern:
-```
-(dev-name)/(task|bug|etc.)/(ticket-id)-(description)
-```
-
-## Example Use Cases
-
-### Quick PR Creation
-```
-/auto-pr
-# Claude handles everything with minimal input
-```
-
-### Custom Target Branch
-```
-/auto-pr
-Claude: What branch should this PR target?
-You: dev
-```
-
-### Review Before Creating
-```
-/auto-pr
-# Review generated content
-# Make adjustments if needed
-# Confirm when ready
-```
+- **No Jira ticket**: Proceeds without ticket reference
+- **Uncommitted changes**: Warns and offers to commit first
+- **Unpushed branch**: Automatically pushes before creating PR
+- **Large PRs**: Warns about size and offers to focus on key files or split
+- **Missing template**: Asks for custom path or proceeds without
+- **No GitHub CLI**: Provides manual git commands
+- **Empty diff**: Alerts about no changes detected
 
 ## Tips
 
-- **Trust the Process**: Claude will guide you through each step
-- **Review Carefully**: Always review the PR preview before confirming
-- **Iterate**: You can ask Claude to adjust the description before creating
-- **Save Time**: Perfect for repetitive PR patterns in your workflow
+1. **Use descriptive branch names** with ticket references when applicable
+2. **Keep PRs focused** - the skill warns about large PRs
+3. **Write clear commit messages** - they enrich the PR description
+4. **Create a PR template** in `.github/pull_request_template.md` for consistency
+5. **Install GitHub CLI** for automatic PR creation
+6. **Commit your changes** before invoking (recommended but not required - skill will prompt if uncommitted changes exist)
 
-## Back to Main Documentation
+## Troubleshooting
 
-[← Back to main README](../README.md)
+| Issue | Solution |
+|-------|----------|
+| Can't find PR template | Check template is in `.github/` or `docs/`, or provide custom path |
+| Branch not pushed | Skill will push automatically, or push manually: `git push -u origin <branch>` |
+| No GitHub CLI | Install from [cli.github.com](https://cli.github.com) or use manual commands |
+| PR too large | Split into smaller PRs or focus on key files only |
+| Don't use Jira | Just say "proceed without" when asked about tickets |
+
+## Quality Assurance
+
+Before creating the PR, the skill ensures:
+- ✓ All template sections populated or marked "N/A" with justification
+- ✓ Formatting exactly matches template
+- ✓ No fabricated information
+- ✓ Proper checklist syntax
+- ✓ Ticket format validated (if applicable)
+- ✓ All information confirmed by you
