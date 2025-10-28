@@ -38,18 +38,20 @@ A standalone bash script that uses the Claude CLI to generate and create PRs dir
 
 [See Bash Script Documentation →](./bash-script/README.md)
 
-### 3. Claude Custom Command
+### 3. Claude PR Creation Agent
 **Best for:** Claude Code users who want integrated AI assistance
 
-A custom command for Claude Code that allows you to create PRs through conversational AI interaction.
+A specialized Claude agent that creates PRs through conversational AI interaction with comprehensive validation and error handling.
 
 **Features:**
-- Natural language interaction
-- Integrated into your Claude Code workflow
-- Step-by-step guidance
+- Natural language interaction ("Create a PR")
+- 6-phase workflow with validation
+- Draft or ready-for-review PR options
+- Step-by-step guidance with confirmation
 - Direct access to Claude's analysis capabilities
+- Works with or without JIRA tickets
 
-[See Claude Command Documentation →](./claude-command/README.md)
+[See Claude Agent Documentation →](./claude-command/README.md)
 
 ## Quick Start
 
@@ -67,21 +69,23 @@ chmod +x claude-auto-pr
 ./claude-auto-pr
 ```
 
-### Claude Custom Command
+### Claude PR Creation Agent
 ```bash
-# Copy command file to your Claude commands directory
-cp claude-command/auto-pr.md ~/.claude/commands/
-# Use in Claude Code:
-/auto-pr
+# Copy the pr-creation agent file to your Claude agents directory
+cp claude-command/pr-creation.md ~/.claude/agents/
+
+# Use in Claude Code with natural language:
+# Just ask Claude: "Create a PR" or "Help me create a pull request"
+# The agent will guide you through the 6-phase workflow
 ```
 
 ## Common Requirements
 
 All solutions expect:
-- A git repository with a PR template at `.github/PULL_REQUEST_TEMPLATE.md`
+- A git repository with a PR template at `.github/PULL_REQUEST_TEMPLATE.md` (optional for Claude agent)
 - Branch naming convention: `(dev-name)/(task|bug|etc.)/(ticket-id)-(description)`
   - Example: `sepehr/task/sa-ebca-11743-change-copy-for-interact`
-- GitHub CLI (`gh`) authenticated (for bash script and Claude command)
+- GitHub CLI (`gh`) authenticated (for bash script and Claude agent)
 
 ## Branch Naming Convention
 
@@ -106,13 +110,14 @@ All solutions automatically:
 
 ## Comparison
 
-| Feature | Chrome Extension | Bash Script | Claude Command |
+| Feature | Chrome Extension | Bash Script | Claude Agent |
 |---------|-----------------|-------------|----------------|
 | **Environment** | Browser | Terminal | Claude Code |
 | **AI Provider** | OpenAI | Claude CLI | Claude Code |
 | **Setup Complexity** | Medium | Low | Low |
 | **Interaction** | GUI | Interactive CLI | Conversational |
 | **PR Creation** | Manual copy-paste | Automatic | Automatic |
+| **Validation** | Manual | Basic | Comprehensive (6-phase) |
 | **Best For** | GUI lovers | CLI enthusiasts | Claude users |
 
 ## Contributing
